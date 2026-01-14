@@ -67,13 +67,11 @@ public class TournamentService : ITournamentService
 
         var participantCount = tournament.Participants.Count;
 
-        // Validate power of 2
         if (participantCount < 2 || !IsPowerOfTwo(participantCount))
         {
             throw new InvalidOperationException($"Tournament must have a power of 2 participants (2, 4, 8, 16, etc.). Current count: {participantCount}");
         }
 
-        // Generate bracket
         var bracket = await _bracketService.GenerateBracketAsync(tournament);
         tournament.Bracket = bracket;
         tournament.BracketId = bracket.Id;
