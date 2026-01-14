@@ -6,24 +6,16 @@ API GraphQL do zarządzania turniejami w systemie pucharowym (bracket/knockout).
 
 - **ASP.NET Core 9.0**
 - **HotChocolate (GraphQL)**
-- **Entity Framework Core**
-- **SQLite**
 - **JWT Authentication**
-- **BCrypt** (hashowanie haseł)
 
-## Jak uruchomić projekt
 
-### 1. Przejdź do katalogu projektu
-```bash
-cd /home/mehow/Developer/graphqlprojekt/TournamentApi
-```
 
-### 2. Uruchom aplikację
+### Uruchom aplikację
 ```bash
 dotnet run
 ```
 
-### 3. Otwórz GraphQL IDE w przeglądarce
+### Otwórz GraphQL IDE w przeglądarce
 Aplikacja uruchomi się domyślnie na porcie wyświetlonym w konsoli (np. `http://localhost:5062`).
 
 Otwórz: **http://localhost:5062/graphql**
@@ -264,65 +256,6 @@ query {
 
 Zwróci tylko mecze, w których zalogowany użytkownik uczestniczy.
 
-## Przykładowy przepływ testowy
-
-### Scenariusz: Turniej 4-osobowy
-
-```graphql
-# 1. Zarejestruj 4 użytkowników
-mutation { register(input: { firstName: "Anna", lastName: "Nowak", email: "anna@test.com", password: "pass123" }) { user { id } } }
-mutation { register(input: { firstName: "Bartek", lastName: "Kowal", email: "bartek@test.com", password: "pass123" }) { user { id } } }
-mutation { register(input: { firstName: "Celina", lastName: "Lis", email: "celina@test.com", password: "pass123" }) { user { id } } }
-mutation { register(input: { firstName: "Dawid", lastName: "Wilk", email: "dawid@test.com", password: "pass123" }) { user { id } } }
-
-# 2. Utwórz turniej
-mutation { createTournament(input: { name: "Turniej Testowy", startDate: "2026-03-01T10:00:00Z" }) { id } }
-
-# 3. Dodaj uczestników
-mutation { addParticipant(tournamentId: 1, userId: 1) { id } }
-mutation { addParticipant(tournamentId: 1, userId: 2) { id } }
-mutation { addParticipant(tournamentId: 1, userId: 3) { id } }
-mutation { addParticipant(tournamentId: 1, userId: 4) { id } }
-
-# 4. Rozpocznij turniej
-mutation { startTournament(tournamentId: 1) { bracket { matches { id round player1 { firstName } player2 { firstName } } } } }
-
-# 5. Rozegraj mecze rundy 1
-mutation { playMatch(matchId: 1, winnerId: 1) { winner { firstName } } }
-mutation { playMatch(matchId: 2, winnerId: 3) { winner { firstName } } }
-
-# 6. Rozegraj finał (runda 2)
-mutation { playMatch(matchId: 3, winnerId: 1) { winner { firstName } } }
-
-# 7. Zakończ turniej
-mutation { finishTournament(tournamentId: 1) { status } }
-```
-
-## Walidacje
-
-### ✅ Co zadziała:
-- Rejestracja z unikalnym emailem
-- Logowanie z poprawnymi danymi
-- Dodawanie uczestników do turnieju ze statusem `Pending`
-- Rozpoczęcie turnieju z 2, 4, 8, 16... uczestnikami
-- Ustawienie zwycięzcy meczu (tylko gracze z tego meczu)
-- Automatyczny awans zwycięzcy do następnej rundy
-- Zakończenie turnieju ze statusem `InProgress`
-
-### ❌ Co zwróci błąd:
-- Rejestracja z istniejącym emailem
-- Logowanie ze złym hasłem
-- Rozpoczęcie turnieju z 3, 5, 6, 7... uczestnikami
-- Dodawanie uczestników po rozpoczęciu turnieju
-- Ponowne rozegranie już rozegranego meczu
-- Ustawienie zwycięzcy, który nie gra w tym meczu
-- Dostęp do `myMatches` bez tokenu JWT
-
-## Statusy turnieju
-
-- **Pending** - turniej utworzony, można dodawać uczestników
-- **InProgress** - turniej rozpoczęty, drabinka wygenerowana
-- **Finished** - turniej zakończony
 
 ## Baza danych
 
@@ -337,43 +270,3 @@ rm tournament.db
 export PATH="$PATH:/home/mehow/.dotnet/tools"
 dotnet ef database update
 ```
-
-## Konfiguracja JWT
-
-Ustawienia JWT znajdują się w `appsettings.json`:
-
-```json
-{
-  "Jwt": {
-    "SecretKey": "YourSuperSecretKeyThatIsAtLeast32CharactersLongForHS256Algorithm",
-    "Issuer": "TournamentApi",
-    "Audience": "TournamentApiUsers",
-    "ExpiryInMinutes": 60
-  }
-}
-```
-
-**Uwaga:** W produkcji zmień `SecretKey` na bezpieczny losowy ciąg!
-
-## Rozwiązywanie problemów
-
-### Port już zajęty
-Jeśli port jest zajęty, zatrzymaj poprzednią instancję (Ctrl+C) lub zmień port w `Properties/launchSettings.json`.
-
-### Błąd migracji
-Jeśli pojawią się błędy związane z bazą danych:
-```bash
-export PATH="$PATH:/home/mehow/.dotnet/tools"
-dotnet ef migrations add InitialCreate --force
-dotnet ef database update
-```
-
-### Token nie działa
-Upewnij się, że:
-1. Dodajesz pełny token (cały długi ciąg)
-2. Format to: `Bearer <token>` (ze spacją po "Bearer")
-3. Token nie wygasł (ważny 60 minut)
-
-## Autor
-
-Projekt stworzony jako API do zarządzania turniejami w systemie pucharowym z wykorzystaniem GraphQL.
