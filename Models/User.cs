@@ -8,7 +8,6 @@ public class User
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
 
-    // Navigation properties
     public ICollection<Tournament> Tournaments { get; set; } = new List<Tournament>();
     public ICollection<Match> MatchesAsPlayer1 { get; set; } = new List<Match>();
     public ICollection<Match> MatchesAsPlayer2 { get; set; } = new List<Match>();

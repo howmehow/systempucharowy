@@ -10,7 +10,6 @@ public class Match
     public int? Player2Id { get; set; }
     public int? WinnerId { get; set; }
 
-    // Navigation properties
     public required Bracket Bracket { get; set; }
     public User? Player1 { get; set; }
     public User? Player2 { get; set; }

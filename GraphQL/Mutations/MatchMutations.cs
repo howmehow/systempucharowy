@@ -13,7 +13,6 @@ public class MatchMutations
     {
         var match = await matchService.PlayMatchAsync(matchId, winnerId);
 
-        // Reload with all relationships
         return await context.Matches
             .Include(m => m.Player1)
             .Include(m => m.Player2)

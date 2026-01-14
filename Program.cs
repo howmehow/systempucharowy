@@ -9,11 +9,9 @@ using TournamentApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure JWT Authentication
 var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer not configured");
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience not configured");
@@ -36,13 +34,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
-// Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITournamentService, TournamentService>();
 builder.Services.AddScoped<IBracketService, BracketService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
 
-// Configure GraphQL
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
@@ -54,7 +50,6 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 app.UseAuthentication();
 app.UseAuthorization();
 

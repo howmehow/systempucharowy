@@ -23,7 +23,6 @@ public class BracketService : IBracketService
             throw new InvalidOperationException("Participant count must be a power of 2");
         }
 
-        // Create bracket
         var bracket = new Bracket
         {
             Tournament = tournament,
@@ -31,15 +30,12 @@ public class BracketService : IBracketService
         };
 
         _context.Brackets.Add(bracket);
-        await _context.SaveChangesAsync(); // Save to get bracket ID
+        await _context.SaveChangesAsync(); 
 
-        // Calculate number of rounds
         var totalRounds = (int)Math.Log2(participantCount);
 
-        // Generate all matches for all rounds
         var allMatches = new List<Match>();
 
-        // Round 1: pair all participants
         var round1Matches = new List<Match>();
         for (int i = 0; i < participantCount; i += 2)
         {
@@ -55,7 +51,6 @@ public class BracketService : IBracketService
         }
         allMatches.AddRange(round1Matches);
 
-        // Subsequent rounds: create empty match slots
         var previousRoundMatchCount = round1Matches.Count;
         for (int round = 2; round <= totalRounds; round++)
         {

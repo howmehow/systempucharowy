@@ -21,16 +21,13 @@ public class AuthService : IAuthService
 
     public async Task<(string Token, User User)> RegisterAsync(string firstName, string lastName, string email, string password)
     {
-        // Check if user already exists
         if (await _context.Users.AnyAsync(u => u.Email == email))
         {
             throw new InvalidOperationException("User with this email already exists");
         }
 
-        // Hash the password
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        // Create new user
         var user = new User
         {
             FirstName = firstName,
@@ -42,7 +39,6 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        // Generate JWT token
         var token = GenerateJwtToken(user);
 
         return (token, user);
@@ -50,7 +46,6 @@ public class AuthService : IAuthService
 
     public async Task<(string Token, User User)?> LoginAsync(string email, string password)
     {
-        // Find user by email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null)
@@ -58,13 +53,11 @@ public class AuthService : IAuthService
             return null;
         }
 
-        // Verify password
         if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
             return null;
         }
 
-        // Generate JWT token
         var token = GenerateJwtToken(user);
 
         return (token, user);

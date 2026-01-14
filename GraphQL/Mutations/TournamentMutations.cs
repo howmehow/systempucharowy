@@ -34,7 +34,6 @@ public class TournamentMutations
     {
         var tournament = await tournamentService.StartTournamentAsync(tournamentId);
 
-        // Reload with all relationships
         return await context.Tournaments
             .Include(t => t.Participants)
             .Include(t => t.Bracket)
